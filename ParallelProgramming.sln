@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Lab1", "Lab1", "{A04B59E4-A1BA-42C5-90D5-1F725BC393D1}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab1", "Lab1\Lab1\Lab1.vcxproj", "{20FB804A-8585-46F4-9A52-B518201A6791}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ThreadsCreator", "Lab1\ThreadsCreator\ThreadsCreator.vcxproj", "{20FB804A-8585-46F4-9A52-B518201A6791}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
