@@ -61,9 +61,9 @@ public:
 
 						Color pixelToAddToFinalSum = bitmapToRead.GetPixel(x, y);
 
-						r += pixelToAddToFinalSum.GetR() * weight;
-						g += pixelToAddToFinalSum.GetG() * weight;
-						b += pixelToAddToFinalSum.GetB() * weight;
+						r += pixelToAddToFinalSum.R * weight;
+						g += pixelToAddToFinalSum.G * weight;
+						b += pixelToAddToFinalSum.B * weight;
 
 						gaussianCoefficient += weight;
 					}

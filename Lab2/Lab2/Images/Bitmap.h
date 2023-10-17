@@ -43,7 +43,7 @@ public:
 	void SetPixel(const int x, const int y, const Color& color)
 	{
 		ValidatePointOrThrow(x, y);
-		m_rawImage->SetPixel(x, y, color.GetB(), color.GetG(), color.GetR(), 0);
+		m_rawImage->SetPixel(x, y, color.B, color.G, color.R, 0);
 	}
 
 	Color GetPixel(const int x, const int y) const

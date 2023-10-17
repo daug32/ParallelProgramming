@@ -10,7 +10,7 @@ int main()
 	const auto sourceImage = Bitmap::FromFile("D:\\Development\\Projects\\ParallelProgramming\\Lab2\\image.bmp");
 
 	std::cout << "Started to blur" << std::endl;
-	const Bitmap result = blurService.Blur(sourceImage, 10, 24);
+	const Bitmap result = blurService.Blur(sourceImage, 5, 10);
 
 	std::cout << "Saving" << std::endl;
 	result.Save("D:\\Development\\Projects\\ParallelProgramming\\Lab2\\image_blured.bmp");
