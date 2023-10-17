@@ -6,19 +6,8 @@
 class AsyncBitmapBlur
 {
 public:
-	AsyncBitmapBlur(bool useProgressNotification = false)
-	{
-		m_useProgressNotification = useProgressNotification;
-	}
-	
 	void Blur(Bitmap& bitmap, const float radius, const int threadsCount) const
-	{
-		ProgressNotificator* progressNotificator = nullptr;
-		if ( m_useProgressNotification )
-		{
-			progressNotificator = new ProgressNotificator(threadsCount);
-		}
-		
+	{		
 		// Create threads params
 		const auto threadsParamsList = new BlurBitmapThreadParams[threadsCount];
 		for (int i = 0; i < threadsCount; i++)
@@ -48,15 +37,7 @@ public:
 		}
 
 		// Wait for all threads
-		for ( int threadIndex = 0; threadIndex < threadsCount; threadIndex++)
-		{
-			WaitForMultipleObjects(1, handles + threadIndex, true, INFINITE);
-			
-			if ( m_useProgressNotification )
-			{
-				progressNotificator->Update(threadIndex + 1);
-			}
-		}
+		WaitForMultipleObjects(threadsCount, handles, true, INFINITE);
         
 		delete[] threadsParamsList;
 		delete[] handles;
@@ -69,8 +50,6 @@ private:
 		float Radius;
 		BlurArea* BlurArea;
 	};
-
-	bool m_useProgressNotification;
 
 	static BlurArea BuildBlurAreaForThread(
 		const Size& bitmapSize,
