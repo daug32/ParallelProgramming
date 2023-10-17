@@ -229,7 +229,9 @@
             <SDLCheck>true</SDLCheck>
             <LinkCompiled>true</LinkCompiled>
         </ClCompile>
+        <ClInclude Include="Images\SynchronousBitmapBlurMaker.h" />
         <ClInclude Include="Libs\BmpImageHandler\Bmp.h" />
+        <ClInclude Include="Libs\Math\Math.h" />
     </ItemGroup>
     <ItemGroup>
       <ClInclude Include="Images\Bitmap.h" />
