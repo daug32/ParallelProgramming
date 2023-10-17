@@ -19,18 +19,20 @@ public:
 	{
 		float rs = ceil(radius * 3);
 		float sigma = radius / 2.0;
-		float sigmaSquare = sigma * sigma;
-		float twoPiSigmaSquare = 2.0 * Math::PI * sigmaSquare;
-		
+		float twoSigmaSquare = 2.0 * sigma * sigma;
+		float twoPiSigmaSquare = Math::PI * twoSigmaSquare;
+
 		for (auto i = params.startHeight; i < params.endHeight; ++i)
 		{
 			for (auto j = params.startWidth; j < params.endWidth; ++j)
 			{
-				auto width = params.endWidth - params.startWidth;
-				auto height = params.endHeight - params.startHeight;
+				if ( i % 10 == 0 )
+				{
+					auto width = params.endWidth - params.startWidth;
+					auto height = params.endHeight - params.startHeight;
+					std::cout << i * width + j << " / " << width * height << std::endl;
+				}
 
-				std::cout << i * width + j << " / " << width * height << std::endl;
-				
 				double r = 0, g = 0, b = 0;
 				double weightSum = 0;
 
@@ -38,30 +40,36 @@ public:
 				{
 					for (int ix = j - rs; ix < j + rs + 1; ++ix)
 					{
-						auto x = min(static_cast<int>(params.endWidth) - 1, max(0, ix));
-						auto y = min(static_cast<int>(params.endHeight) - 1, max(0, iy));
-
-						float distanceSquare = (ix - j) * (ix - j) + (iy - i) * (iy - i);
-						float weight = exp(-distanceSquare / (2.0 * sigmaSquare)) / twoPiSigmaSquare;
-
-						Color pixel = bitmap.GetPixel(x, y);
+						float weight = exp( -GetSquareDistance(j, i, ix, iy) / twoSigmaSquare ) / twoPiSigmaSquare;
+						
+						Color pixel = bitmap.GetPixel(
+							min(params.endWidth - 1, max(0, ix)),
+							min(params.endHeight - 1, max(0, iy)));
 
 						r += pixel.GetR() * weight;
 						g += pixel.GetG() * weight;
 						b += pixel.GetB() * weight;
+						
 						weightSum += weight;
 					}
 				}
-				
-				Color pixel = bitmap.GetPixel(j, i);
-				
-				pixel.SetR(std::round(r / weightSum));
-				pixel.SetG(std::round(g / weightSum));
-				pixel.SetB(std::round(b / weightSum));
 
-				bitmap.SetPixel( j, i, pixel );
+				Color newPixel = bitmap.GetPixel(j, i);
+
+				newPixel.SetR(std::round(r / weightSum));
+				newPixel.SetG(std::round(g / weightSum));
+				newPixel.SetB(std::round(b / weightSum));
+
+				bitmap.SetPixel(j, i, newPixel);
 			}
 		}
 	}
 
+private:
+	inline static double GetSquareDistance(double x0, double y0, double x1, double y1) 
+	{
+		auto dX = x1 - x0;
+		auto dY = y1 - y0;
+		return dX * dX + dY * dY;
+	}
 };
