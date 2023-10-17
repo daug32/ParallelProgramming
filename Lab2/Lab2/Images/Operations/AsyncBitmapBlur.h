@@ -27,7 +27,7 @@ public:
 		}
 
 		// Create thread objects
-		auto threadObjects = new HANDLE[threadsCount];
+		const auto threadObjects = new HANDLE[threadsCount];
 		for (int i = 0; i < threadsCount; i++)
 		{
 			threadObjects[i] = CreateThread(NULL, i, &StartThreads, &threadsParamsList[i], CREATE_SUSPENDED, NULL);

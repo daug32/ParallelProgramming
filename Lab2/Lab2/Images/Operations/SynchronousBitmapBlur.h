@@ -12,14 +12,21 @@ public:
 		m_needToShowProgress = needToShowProgress;
 	}
 
-	Bitmap Blur(const Bitmap& sourceBitmap, const float radius, BlurArea& blurArea) const
+	Bitmap Blur(
+		const Bitmap& sourceBitmap, 
+		const float radius, 
+		const BlurArea& blurArea) const
 	{
 		Bitmap result = Bitmap::CreateEmpty(sourceBitmap.GetSize());
 		Blur(sourceBitmap, result, radius, blurArea);
 		return result;
 	}
-
-	void Blur(const Bitmap& bitmapToRead, Bitmap& result, const float radius, BlurArea& blurArea) const
+	
+	void Blur(
+		const Bitmap& bitmapToRead, 
+		Bitmap& result, 
+		const float radius, 
+		const BlurArea& blurArea) const
 	{
 		if (bitmapToRead.GetSize() != result.GetSize())
 		{
@@ -45,12 +52,14 @@ public:
 				{
 					for (int x = centerX - radius; x < centerX + radius + 1; ++x)
 					{
-						const float weight = exp(-GetSquareDistance(centerX, centerY, x, y) / twoSigmaSquare) /
-							twoPiSigmaSquare;
+						if (!bitmapToRead.HasPoint(x, y))
+						{
+							continue;
+						}
+						
+						const float weight = exp(-GetSquareDistance(centerX, centerY, x, y) / twoSigmaSquare) / twoPiSigmaSquare;
 
-						Color pixelToAddToFinalSum = bitmapToRead.GetPixel(
-							min(bitmapToRead.GetSize().GetWidth() - 1, max(0, x)),
-							min(bitmapToRead.GetSize().GetHeight() - 1, max(0, y)));
+						Color pixelToAddToFinalSum = bitmapToRead.GetPixel(x, y);
 
 						r += pixelToAddToFinalSum.GetR() * weight;
 						g += pixelToAddToFinalSum.GetG() * weight;
@@ -73,16 +82,16 @@ public:
 	}
 
 private:
+	bool m_needToShowProgress;
+	
 	inline static float GetSquareDistance(
 		const float x0,
 		const float y0,
 		const float x1,
 		const float y1)
 	{
-		auto dX = x1 - x0;
-		auto dY = y1 - y0;
+		const auto dX = x1 - x0;
+		const auto dY = y1 - y0;
 		return dX * dX + dY * dY;
 	}
-
-	bool m_needToShowProgress;
 };

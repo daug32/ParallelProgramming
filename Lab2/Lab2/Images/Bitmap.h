@@ -7,18 +7,18 @@
 class Bitmap
 {
 public:
-	static Bitmap FromFile(const std::string& path)
+	inline static Bitmap FromFile(const std::string& path)
 	{
 		const auto rawImage = new BMP(path.c_str());
 		return Bitmap(rawImage);
 	}
 
-	static Bitmap CreateEmpty(const Size& size)
+	inline static Bitmap CreateEmpty(const Size& size)
 	{
 		return CreateEmpty(size.GetWidth(), size.GetHeight());
 	}
 
-	static Bitmap CreateEmpty(const int width, const int height)
+	inline static Bitmap CreateEmpty(const int width, const int height)
 	{
 		return Bitmap(new BMP(width, height, false));
 	}
@@ -38,7 +38,7 @@ public:
 		m_rawImage->Write(path.c_str());
 	}
 
-	Size GetSize() const { return m_size; }
+	inline Size GetSize() const { return m_size; }
 
 	void SetPixel(const int x, const int y, const Color& color)
 	{
@@ -58,6 +58,13 @@ public:
 			m_rawImage->Data[offset]);
 	}
 
+	inline bool HasPoint(const int x, const int y) const
+	{
+		return
+			x >= 0 && x < m_size.GetWidth() &&
+			y >= 0 && y < m_size.GetHeight();
+	} 
+
 private:
 	explicit Bitmap(BMP* bmp) : m_rawImage(bmp)
 	{
@@ -71,7 +78,7 @@ private:
 
 	inline void ValidatePointOrThrow(const int x, const int y) const
 	{
-		if (x >= m_rawImage->BmpInfoHeader.width || y >= m_rawImage->BmpInfoHeader.height || x < 0 || y < 0)
+		if (!HasPoint(x, y))
 		{
 			throw std::runtime_error("The point is outside of the image boundaries!");
 		}

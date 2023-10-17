@@ -169,7 +169,7 @@ struct BMP
 		BmpInfoHeader.bit_count = 24;
 		BmpInfoHeader.compression = 0;
 		m_rowStride = width * 3;
-		Data.resize(m_rowStride * height);
+		Data.resize(m_rowStride * height, 0);
 
 		const uint32_t newStride = MakeStrideAligned(4);
 		FileHeader.file_size =
