@@ -1,68 +1,58 @@
 ﻿#pragma once
-#include <windows.h>
-
 #include "../Bitmap.h"
 #include "../../Libs/Math/Math.h"
 #include "BlurArea.h"
+#include "../../Libs/ProgressNotificators/ProgressNotificator.h"
 
 class SynchronousBitmapBlur
 {
 public:	
-	static void Blur(Bitmap& bitmap, float radius, BlurArea& params)
+	static void Blur(Bitmap& bitmap, float radius, BlurArea& blurArea)
 	{
+		auto progressNotificator = ProgressNotificator(blurArea.Height * blurArea.Width);
+		
 		const float sigma = radius / 2.0f;
 		const float twoSigmaSquare = 2.0f * sigma * sigma;
 		const float twoPiSigmaSquare = Math::PI * twoSigmaSquare;
-
-		for (auto y = params.StartHeight; y < params.EndHeight; ++y)
+		
+		for (int centerY = blurArea.StartHeight; centerY < blurArea.EndHeight; centerY++)
 		{
-			for (auto x = params.StartWidth; x < params.EndWidth; ++x)
+			for (int centerX = blurArea.StartWidth; centerX < blurArea.EndWidth; centerX++)
 			{
-				Color currentPixel = bitmap.GetPixel(x, y);
-				
 				float gaussianCoefficient = 0;
 				float r = 0, g = 0, b = 0;
 
-				for (int iy = y - radius; iy < y + radius + 1; ++iy)
+				for (int y = centerY - radius; y < centerY + radius + 1; ++y)
 				{
-					for (int ix = x - radius; ix < x + radius + 1; ++ix)
+					for (int x = centerX - radius; x < centerX + radius + 1; ++x)
 					{
-						float weight = exp( -GetSquareDistance(x, y, ix, iy) / twoSigmaSquare ) / twoPiSigmaSquare;
-						
-						Color pixel = bitmap.GetPixel(
-							min(params.EndWidth - 1, max(0, ix)),
-							min(params.EndHeight - 1, max(0, iy)));
+						const float weight = exp( -GetSquareDistance(centerX, centerY, x, y) / twoSigmaSquare ) / twoPiSigmaSquare;
 
-						r += pixel.GetR() * weight;
-						g += pixel.GetG() * weight;
-						b += pixel.GetB() * weight;
+						Color pixelToAddToFinalSum = bitmap.UnsafeGetPixel(
+							std::min(blurArea.EndWidth - 1, std::max(0, x)),
+							std::min(blurArea.EndHeight - 1, std::max(0, y)) );
+
+						r += pixelToAddToFinalSum.GetR() * weight;
+						g += pixelToAddToFinalSum.GetG() * weight;
+						b += pixelToAddToFinalSum.GetB() * weight;
 						
 						gaussianCoefficient += weight;
 					}
 				}
 
-				currentPixel.SetR(r / gaussianCoefficient);
-				currentPixel.SetG(g / gaussianCoefficient);
-				currentPixel.SetB(b / gaussianCoefficient);
-
-				bitmap.SetPixel(x, y, currentPixel);
+				auto newColor = Color(
+					r / gaussianCoefficient,
+					g / gaussianCoefficient,
+					b / gaussianCoefficient);
 				
-				LogProcessingInfo(x, y, params);
+				bitmap.SetPixel(centerX, centerY, newColor);
+				
+				progressNotificator.Update(centerY * blurArea.Width + centerX);
 			}
 		}
 	}
 
 private:
-	inline static void LogProcessingInfo(uint32_t x, uint32_t y, BlurArea& params)
-	{
-		if ( y % 10 == 0 )
-		{
-			auto width = params.EndWidth - params.StartWidth;
-			auto height = params.EndHeight - params.StartHeight;
-			std::cout << y * width + x << " / " << width * height << std::endl;
-		}
-	}
-	
 	inline static float GetSquareDistance(
 		const float x0,
 		const float y0,

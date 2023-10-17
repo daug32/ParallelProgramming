@@ -239,6 +239,9 @@
       <ClInclude Include="Images\Color.h" />
       <ClInclude Include="Images\Size.h" />
     </ItemGroup>
+    <ItemGroup>
+      <ClInclude Include="Libs\ProgressNotificators\ProgressNotificator.h" />
+    </ItemGroup>
     <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
     <ImportGroup Label="ExtensionTargets">
     </ImportGroup>

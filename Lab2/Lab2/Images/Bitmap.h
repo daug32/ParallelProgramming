@@ -41,14 +41,22 @@ public:
 	void SetPixel(const int x, const int y, const Color& color)
 	{
 		ValidatePointOrThrow(x, y);
+		UnsafeSetPixel(x, y, color);		
+	}
 
+	void UnsafeSetPixel(const int x, const int y, const Color& color)
+	{
 		m_rawImage->SetPixel(x, y, color.GetB(), color.GetG(), color.GetR(), 0);
 	}
 
 	Color GetPixel(const int x, const int y) const
 	{
 		ValidatePointOrThrow(x, y);
+		return UnsafeGetPixel(x, y);
+	}
 
+	Color UnsafeGetPixel(const int x, const int y) const
+	{
 		const int offset = m_channelsNumber * (y * m_size.GetWidth() + x);
 
 		return Color(
