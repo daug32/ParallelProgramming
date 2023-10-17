@@ -13,14 +13,14 @@ struct Color
 		m_g = g;
 	}
 
-	int GetR() const { return m_r; }
-	void SetR(const int value ) { m_r = value; }
+	inline int GetR() const { return m_r; }
+	inline void SetR(const int value ) { m_r = value; }
 	
-	int GetG() const { return m_g; }
-	void SetG(const int value ) { m_g = value; }
+	inline int GetG() const { return m_g; }
+	inline void SetG(const int value ) { m_g = value; }
 	
-	int GetB() const { return m_b; }
-	void SetB(const int value ) { m_b = value; }
+	inline int GetB() const { return m_b; }
+	inline void SetB(const int value ) { m_b = value; }
 
 private:
 	int m_r;

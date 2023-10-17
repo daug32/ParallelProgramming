@@ -2,5 +2,5 @@
 
 namespace Math
 {
-	static const double PI = 3.14159265359;
+	static const float PI = 3.14159265359f;
 };
