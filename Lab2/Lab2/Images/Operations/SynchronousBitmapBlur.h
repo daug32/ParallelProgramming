@@ -7,11 +7,11 @@
 class SynchronousBitmapBlur
 {
 public:
-	SynchronousBitmapBlur(bool useProgressNotificator = false)
+	SynchronousBitmapBlur(bool needToShowProgress = false)
 	{
-		m_useProgressNotificator = useProgressNotificator;
+		m_needToShowProgress = needToShowProgress;
 	}
-	
+
 	Bitmap Blur(const Bitmap& sourceBitmap, const float radius, BlurArea& blurArea) const
 	{
 		Bitmap result = Bitmap::CreateEmpty(sourceBitmap.GetSize());
@@ -19,18 +19,21 @@ public:
 		return result;
 	}
 
-	void Blur(const Bitmap& bitmapToRead, Bitmap& bitmapToSaveResult, const float radius, BlurArea& blurArea) const
+	void Blur(const Bitmap& bitmapToRead, Bitmap& result, const float radius, BlurArea& blurArea) const
 	{
-		ProgressNotificator* progressNotificator = nullptr;
-		if ( m_useProgressNotificator )
+		if (bitmapToRead.GetSize() != result.GetSize())
 		{
-			progressNotificator = new ProgressNotificator(blurArea.Height * blurArea.Width);
+			throw std::exception("Result bitmap must be same size as the bitmap to read");
 		}
-		
+
+		auto progressNotificator = ProgressNotificator(
+			blurArea.Height * blurArea.Width,
+			m_needToShowProgress);
+
 		const float sigma = radius / 2.0f;
 		const float twoSigmaSquare = 2.0f * sigma * sigma;
 		const float twoPiSigmaSquare = Math::PI * twoSigmaSquare;
-		
+
 		for (int centerY = blurArea.StartHeight; centerY < blurArea.EndHeight; centerY++)
 		{
 			for (int centerX = blurArea.StartWidth; centerX < blurArea.EndWidth; centerX++)
@@ -42,16 +45,17 @@ public:
 				{
 					for (int x = centerX - radius; x < centerX + radius + 1; ++x)
 					{
-						const float weight = exp( -GetSquareDistance(centerX, centerY, x, y) / twoSigmaSquare ) / twoPiSigmaSquare;
+						const float weight = exp(-GetSquareDistance(centerX, centerY, x, y) / twoSigmaSquare) /
+							twoPiSigmaSquare;
 
 						Color pixelToAddToFinalSum = bitmapToRead.GetPixel(
 							min(bitmapToRead.GetSize().GetWidth() - 1, max(0, x)),
-							min(bitmapToRead.GetSize().GetHeight() - 1, max(0, y)) );
+							min(bitmapToRead.GetSize().GetHeight() - 1, max(0, y)));
 
 						r += pixelToAddToFinalSum.GetR() * weight;
 						g += pixelToAddToFinalSum.GetG() * weight;
 						b += pixelToAddToFinalSum.GetB() * weight;
-						
+
 						gaussianCoefficient += weight;
 					}
 				}
@@ -60,19 +64,11 @@ public:
 					r / gaussianCoefficient,
 					g / gaussianCoefficient,
 					b / gaussianCoefficient);
-				
-				bitmapToSaveResult.SetPixel(centerX, centerY, newColor);
-				
-				if ( m_useProgressNotificator )
-				{
-					progressNotificator->Update(centerY * blurArea.Width + centerX);
-				}
-			}
-		}
 
-		if ( m_useProgressNotificator )
-		{
-			delete progressNotificator;
+				result.SetPixel(centerX, centerY, newColor);
+
+				progressNotificator.Update(centerY * blurArea.Width + centerX);
+			}
 		}
 	}
 
@@ -81,12 +77,12 @@ private:
 		const float x0,
 		const float y0,
 		const float x1,
-		const float y1) 
+		const float y1)
 	{
 		auto dX = x1 - x0;
 		auto dY = y1 - y0;
 		return dX * dX + dY * dY;
 	}
-	
-	bool m_useProgressNotificator;
+
+	bool m_needToShowProgress;
 };

@@ -20,7 +20,7 @@ public:
 
 	static Bitmap CreateEmpty(const int width, const int height)
 	{
-		return Bitmap(new BMP(width,height, false));
+		return Bitmap(new BMP(width, height, false));
 	}
 
 	~Bitmap()
@@ -38,10 +38,7 @@ public:
 		m_rawImage->Write(path.c_str());
 	}
 
-	Size GetSize() const
-	{
-		return m_size;
-	}
+	Size GetSize() const { return m_size; }
 
 	void SetPixel(const int x, const int y, const Color& color)
 	{
@@ -52,7 +49,7 @@ public:
 	Color GetPixel(const int x, const int y) const
 	{
 		ValidatePointOrThrow(x, y);
-		
+
 		const int offset = m_channelsNumber * (y * m_size.GetWidth() + x);
 
 		return Color(
