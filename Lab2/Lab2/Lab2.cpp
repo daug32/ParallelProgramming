@@ -1,13 +1,13 @@
 #include <string>
 
-#include "Images/BmpImage.h"
+#include "Images/Bitmap.h"
 #include "Libs/BmpImageHandler/Bmp.h"
 
 int main()
 {
 	const std::string path = "D:\\Development\\Projects\\ParallelProgramming\\Lab2\\ris2.bmp";
 
-	auto image = BmpImage::FromFile(path);
+	auto image = Bitmap::FromFile(path);
 	
 	const auto color = Color(255, 255, 255);
 	for ( int x = 0; x < image.GetSize().GetWidth(); x++ )

@@ -232,7 +232,7 @@
         <ClInclude Include="Libs\BmpImageHandler\Bmp.h" />
     </ItemGroup>
     <ItemGroup>
-      <ClInclude Include="Images\BmpImage.h" />
+      <ClInclude Include="Images\Bitmap.h" />
       <ClInclude Include="Images\Color.h" />
       <ClInclude Include="Images\Size.h" />
     </ItemGroup>

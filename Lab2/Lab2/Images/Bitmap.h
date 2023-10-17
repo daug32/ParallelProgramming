@@ -4,16 +4,16 @@
 #include "Size.h"
 #include "../Libs/BmpImageHandler/Bmp.h"
 
-class BmpImage
+class Bitmap
 {
 public:
-	static BmpImage FromFile(const std::string& path)
+	static Bitmap FromFile(const std::string& path)
 	{
 		const auto rawImage = new BMP(path.c_str());
-		return BmpImage(path, rawImage);
+		return Bitmap(path, rawImage);
 	}
 
-	~BmpImage()
+	~Bitmap()
 	{
 		delete m_rawImage;
 	}
@@ -62,7 +62,7 @@ public:
 	}
 
 private:
-	explicit BmpImage(const std::string& path, BMP* bmp)
+	explicit Bitmap(const std::string& path, BMP* bmp)
 		: m_path(path), m_rawImage(bmp)
 	{
 		m_size = Size(m_rawImage->BmpInfoHeader.width, m_rawImage->BmpInfoHeader.height);
