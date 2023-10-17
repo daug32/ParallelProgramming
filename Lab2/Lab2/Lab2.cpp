@@ -9,12 +9,13 @@ int main()
 
 	auto image = BmpImage::FromFile(path);
 	
-	const auto color = Color(255, 0, 0);
-	for ( int i = 0; i < image.GetSize().GetWidth() / 2; i++ )
+	const auto color = Color(255, 255, 255);
+	for ( int x = 0; x < image.GetSize().GetWidth(); x++ )
 	{
-		image.SetPixel(i, 0, color);
-		image.SetPixel(i, 1, color);
-		image.SetPixel(i, 2, color);
+		for ( int y = 0; y < image.GetSize().GetHeight(); y++ )
+		{
+			image.SetPixel(x, y, color);		
+		}
 	}
 
 	image.Save("D:\\Development\\Projects\\ParallelProgramming\\Lab2\\ris2_udpated.bmp");

@@ -40,18 +40,20 @@ public:
 
 	void SetPixel(const int x, const int y, const Color& color)
 	{
-		m_rawImage->SetPixel(x, y, color.GetB(), color.GetG(), color.GetR(), 0);
+		m_rawImage->SetPixel(x, m_size.GetHeight() - y - 1, color.GetB(), color.GetG(), color.GetR(), 0);
 	}
 
 	Color GetPixel(const int x, const int y) const
 	{
-		if (x >= m_rawImage->BmpInfoHeader.width || y >= m_rawImage->BmpInfoHeader.height || x < 0 || y < 0)
+		int newY = m_size.GetHeight() - y;
+		
+		if (x >= m_rawImage->BmpInfoHeader.width || newY >= m_rawImage->BmpInfoHeader.height || x < 0 || newY < 0)
 		{
 			throw std::runtime_error("The point is outside of the image boundaries!");
 		}
 		
 		const uint32_t channels = m_rawImage->BmpInfoHeader.bit_count / 8;
-		const int offset = channels * (y * m_rawImage->BmpInfoHeader.width + x);
+		const int offset = channels * (newY * m_rawImage->BmpInfoHeader.width + x);
 
 		return Color(
 			m_rawImage->Data[offset + 2],
