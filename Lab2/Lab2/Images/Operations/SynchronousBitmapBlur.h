@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include <windows.h>
 #include "../Bitmap.h"
 #include "../../Libs/Math/Math.h"
 #include "BlurArea.h"
@@ -13,7 +12,14 @@ public:
 		m_useProgressNotificator = useProgressNotificator;
 	}
 	
-	void Blur(Bitmap& bitmap, const float radius, BlurArea& blurArea) const
+	Bitmap Blur(const Bitmap& sourceBitmap, const float radius, BlurArea& blurArea) const
+	{
+		Bitmap result = Bitmap::CreateEmpty(sourceBitmap.GetSize());
+		Blur(sourceBitmap, result, radius, blurArea);
+		return result;
+	}
+
+	void Blur(const Bitmap& bitmapToRead, Bitmap& bitmapToSaveResult, const float radius, BlurArea& blurArea) const
 	{
 		ProgressNotificator* progressNotificator = nullptr;
 		if ( m_useProgressNotificator )
@@ -38,9 +44,9 @@ public:
 					{
 						const float weight = exp( -GetSquareDistance(centerX, centerY, x, y) / twoSigmaSquare ) / twoPiSigmaSquare;
 
-						Color pixelToAddToFinalSum = bitmap.UnsafeGetPixel(
-							min(blurArea.EndWidth - 1, max(0, x)),
-							min(blurArea.EndHeight - 1, max(0, y)) );
+						Color pixelToAddToFinalSum = bitmapToRead.GetPixel(
+							min(bitmapToRead.GetSize().GetWidth() - 1, max(0, x)),
+							min(bitmapToRead.GetSize().GetHeight() - 1, max(0, y)) );
 
 						r += pixelToAddToFinalSum.GetR() * weight;
 						g += pixelToAddToFinalSum.GetG() * weight;
@@ -55,7 +61,7 @@ public:
 					g / gaussianCoefficient,
 					b / gaussianCoefficient);
 				
-				bitmap.SetPixel(centerX, centerY, newColor);
+				bitmapToSaveResult.SetPixel(centerX, centerY, newColor);
 				
 				if ( m_useProgressNotificator )
 				{

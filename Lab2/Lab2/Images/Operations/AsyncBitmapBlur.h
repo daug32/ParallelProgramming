@@ -6,17 +6,20 @@
 class AsyncBitmapBlur
 {
 public:
-	void Blur(Bitmap& bitmap, const float radius, const int threadsCount) const
-	{		
+	Bitmap Blur(Bitmap& sourceBitmap, const float radius, const int threadsCount) const
+	{
+		Bitmap result = Bitmap::CreateEmpty(sourceBitmap.GetSize());
+		
 		// Create threads params
 		const auto threadsParamsList = new BlurBitmapThreadParams[threadsCount];
 		for (int i = 0; i < threadsCount; i++)
 		{
-			const auto area = BuildBlurAreaForThread(bitmap.GetSize(), i, threadsCount);
+			const auto area = BuildBlurAreaForThread(sourceBitmap.GetSize(), i, threadsCount);
 			
 			auto threadParams = BlurBitmapThreadParams();
 			
-			threadParams.Bitmap = &bitmap;
+			threadParams.SourceBitmap = &sourceBitmap;
+			threadParams.DestinationBitmap = &result;
 			threadParams.BlurArea = new BlurArea(area);
 			threadParams.Radius = radius;
 
@@ -41,12 +44,16 @@ public:
         
 		delete[] threadsParamsList;
 		delete[] handles;
+
+		return result;
 	}
 
 private:
 	struct BlurBitmapThreadParams
 	{
-		Bitmap* Bitmap;
+		Bitmap* SourceBitmap;
+		Bitmap* DestinationBitmap;
+		
 		float Radius;
 		BlurArea* BlurArea;
 	};
@@ -74,9 +81,10 @@ private:
 
 		BlurArea blurArea = *params->BlurArea;
 		const float radius = params->Radius;
-		Bitmap bitmap = *params->Bitmap;
+		const Bitmap sourceBitmap = *params->SourceBitmap;
+		Bitmap destinationBitmap = *params->DestinationBitmap;
 
-		blurService.Blur(bitmap, radius, blurArea);
+		blurService.Blur(sourceBitmap, destinationBitmap, radius, blurArea);
 		
 		ExitThread(0);  
 	}

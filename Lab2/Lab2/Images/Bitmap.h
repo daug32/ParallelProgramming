@@ -10,17 +10,22 @@ public:
 	static Bitmap FromFile(const std::string& path)
 	{
 		const auto rawImage = new BMP(path.c_str());
-		return Bitmap(path, rawImage);
+		return Bitmap(rawImage);
+	}
+
+	static Bitmap CreateEmpty(const Size& size)
+	{
+		return CreateEmpty(size.GetWidth(), size.GetHeight());
+	}
+
+	static Bitmap CreateEmpty(const int width, const int height)
+	{
+		return Bitmap(new BMP(width,height, false));
 	}
 
 	~Bitmap()
 	{
 		delete m_rawImage;
-	}
-
-	void Save() const
-	{
-		Save(m_path);
 	}
 
 	void Save(const std::string& path) const
@@ -41,22 +46,13 @@ public:
 	void SetPixel(const int x, const int y, const Color& color)
 	{
 		ValidatePointOrThrow(x, y);
-		UnsafeSetPixel(x, y, color);		
-	}
-
-	void UnsafeSetPixel(const int x, const int y, const Color& color)
-	{
 		m_rawImage->SetPixel(x, y, color.GetB(), color.GetG(), color.GetR(), 0);
 	}
 
 	Color GetPixel(const int x, const int y) const
 	{
 		ValidatePointOrThrow(x, y);
-		return UnsafeGetPixel(x, y);
-	}
-
-	Color UnsafeGetPixel(const int x, const int y) const
-	{
+		
 		const int offset = m_channelsNumber * (y * m_size.GetWidth() + x);
 
 		return Color(
@@ -66,13 +62,12 @@ public:
 	}
 
 private:
-	explicit Bitmap(const std::string& path, BMP* bmp) : m_path(path), m_rawImage(bmp)
+	explicit Bitmap(BMP* bmp) : m_rawImage(bmp)
 	{
 		m_size = Size(m_rawImage->BmpInfoHeader.width, m_rawImage->BmpInfoHeader.height);
 		m_channelsNumber = m_rawImage->BmpInfoHeader.bit_count / 8;
 	}
 
-	std::string m_path;
 	BMP* m_rawImage;
 	Size m_size;
 	uint32_t m_channelsNumber;
