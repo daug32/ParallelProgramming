@@ -229,6 +229,7 @@
             <SDLCheck>true</SDLCheck>
             <LinkCompiled>true</LinkCompiled>
         </ClCompile>
+        <ClInclude Include="Images\Operations\AsyncBitmapBlur.h" />
         <ClInclude Include="Images\Operations\BlurArea.h" />
         <ClInclude Include="Images\Operations\SynchronousBitmapBlur.h" />
         <ClInclude Include="Libs\BmpImageHandler\Bmp.h" />

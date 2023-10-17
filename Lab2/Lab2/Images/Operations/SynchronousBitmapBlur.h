@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include <windows.h>
 #include "../Bitmap.h"
 #include "../../Libs/Math/Math.h"
 #include "BlurArea.h"
@@ -6,10 +7,19 @@
 
 class SynchronousBitmapBlur
 {
-public:	
-	static void Blur(Bitmap& bitmap, float radius, BlurArea& blurArea)
+public:
+	SynchronousBitmapBlur(bool useProgressNotificator = false)
 	{
-		auto progressNotificator = ProgressNotificator(blurArea.Height * blurArea.Width);
+		m_useProgressNotificator = useProgressNotificator;
+	}
+	
+	void Blur(Bitmap& bitmap, const float radius, BlurArea& blurArea) const
+	{
+		ProgressNotificator* progressNotificator = nullptr;
+		if ( m_useProgressNotificator )
+		{
+			progressNotificator = new ProgressNotificator(blurArea.Height * blurArea.Width);
+		}
 		
 		const float sigma = radius / 2.0f;
 		const float twoSigmaSquare = 2.0f * sigma * sigma;
@@ -29,8 +39,8 @@ public:
 						const float weight = exp( -GetSquareDistance(centerX, centerY, x, y) / twoSigmaSquare ) / twoPiSigmaSquare;
 
 						Color pixelToAddToFinalSum = bitmap.UnsafeGetPixel(
-							std::min(blurArea.EndWidth - 1, std::max(0, x)),
-							std::min(blurArea.EndHeight - 1, std::max(0, y)) );
+							min(blurArea.EndWidth - 1, max(0, x)),
+							min(blurArea.EndHeight - 1, max(0, y)) );
 
 						r += pixelToAddToFinalSum.GetR() * weight;
 						g += pixelToAddToFinalSum.GetG() * weight;
@@ -47,8 +57,16 @@ public:
 				
 				bitmap.SetPixel(centerX, centerY, newColor);
 				
-				progressNotificator.Update(centerY * blurArea.Width + centerX);
+				if ( m_useProgressNotificator )
+				{
+					progressNotificator->Update(centerY * blurArea.Width + centerX);
+				}
 			}
+		}
+
+		if ( m_useProgressNotificator )
+		{
+			delete progressNotificator;
 		}
 	}
 
@@ -63,4 +81,6 @@ private:
 		auto dY = y1 - y0;
 		return dX * dX + dY * dY;
 	}
+	
+	bool m_useProgressNotificator;
 };
